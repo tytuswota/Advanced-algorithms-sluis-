@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>
+const int POOL_SIZE = 5;
+const int KOLK_SIZE = 3;
+
+const int CHECKTIJD = 2;
+const int AANVOERTIJD = 5;
+const int DEURTIJD  = 2;
+const int KLEPTIJD  = 1;
+const int NIVELLEERTIJD = 8;
+
+chan waterpeil, deurOpen[2], deurDicht[2], klepOpen[2], klepDicht[2], schip;
+chan groen[4], roodGroen[4], rood[4];
+
+typedef int[0,1] side_id;
+typedef int[0,3] stoplicht_id;
+typedef int[0,1] pool_id;
+
+typedef int[0,POOL_SIZE] pool_counter;
+typedef int[0,KOLK_SIZE] kolk_counter;
+
+bool deurState[2]={0,0};
+
+pool_counter pool[2];
+//0
+//binnen
+//1
+
+
+bool isPoolFull(pool_id p)
+{
+    return pool[p]==POOL_SIZE;
+}
+
+bool isPoolEmpty(pool_id p)
+{
+    return pool[p]==0;
+}
+
+bool arePoolsEmpty()
+{
+    return isPoolEmpty(0) &amp;&amp; isPoolEmpty(1);
+}
+</declaration>
+	<template>
+		<name x="5" y="5">Controller</name>
+		<declaration>clock x;
+bool side=0;
+// side 0 = jou kant, side = 1 overkant
+
+kolk_counter kolk=0;
+
+const int MIN_INVAARTIJD = 2;
+const int EXTRA_INVAARTIJD = 1;
+
+int vaarTijd =0;
+
+bool isKolkEmpty()
+{
+    return kolk==0;
+}
+
+bool isKolkFull()
+{
+    return kolk==KOLK_SIZE;
+}
+
+void invaren()
+{
+    pool[side]--;
+    kolk++;
+}
+
+void uitvaren()
+{
+    kolk--;
+}
+
+bool chooseSide()
+{
+    return (pool[side]==0) ? !side : side;
+}
+
+bool areBothDoorsClosed()
+{
+    return deurState[0]==0 &amp;&amp; deurState[1]==0;
+}
+
+void calculateTime()
+{
+    int aantalBoten = pool[side]&gt;=KOLK_SIZE ? KOLK_SIZE : pool[side];
+
+    vaarTijd = (MIN_INVAARTIJD + (aantalBoten * EXTRA_INVAARTIJD)) / aantalBoten;
+}</declaration>
+		<location id="id0" x="1326" y="34">
+			<committed/>
+		</location>
+		<location id="id1" x="1054" y="-238">
+			<committed/>
+		</location>
+		<location id="id2" x="680" y="-238">
+		</location>
+		<location id="id3" x="680" y="-68">
+			<committed/>
+		</location>
+		<location id="id4" x="918" y="34">
+			<committed/>
+		</location>
+		<location id="id5" x="1190" y="34">
+			<committed/>
+		</location>
+		<location id="id6" x="510" y="34">
+			<committed/>
+		</location>
+		<location id="id7" x="1054" y="34">
+			<name x="1003" y="51">kleppenDicht_Nside</name>
+		</location>
+		<location id="id8" x="1666" y="-102">
+			<name x="1564" y="-110">Uitvaren_side</name>
+			<label kind="invariant" x="1581" y="-93">x&lt;=vaarTijd</label>
+		</location>
+		<location id="id9" x="1326" y="136">
+			<name x="1283" y="153">DeurOpen_side</name>
+		</location>
+		<location id="id10" x="374" y="34">
+			<name x="331" y="51">DeurDicht_Nside</name>
+		</location>
+		<location id="id11" x="1326" y="-102">
+			<name x="1224" y="-119">Invaren_side</name>
+			<label kind="invariant" x="1232" y="-102">x&lt;=vaarTijd</label>
+		</location>
+		<location id="id12" x="204" y="-102">
+			<name x="229" y="-119">handleRequest</name>
+			<label kind="invariant" x="229" y="-102">x&lt;=1</label>
+		</location>
+		<location id="id13" x="0" y="-102">
+			<name x="-17" y="-85">checkRequest</name>
+			<label kind="invariant" x="-17" y="-68">x&lt;=CHECKTIJD</label>
+			<label kind="comments" x="-161" y="212">Beter kijken naar het vier variable model
+Aanmeldingssysteem
+
+3 dobbers
+
+Model van de pool en kolk zelf maken voor het in en uitvaren van de boten</label>
+		</location>
+		<location id="id14" x="646" y="34">
+			<name x="586" y="51">kleppenOpen_Nside</name>
+		</location>
+		<location id="id15" x="782" y="34">
+			<name x="756" y="51">Nivelleren</name>
+		</location>
+		<init ref="id13"/>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="guard" x="1445" y="136">!isKolkEmpty()</label>
+			<label kind="synchronisation" x="1445" y="153">deurOpen[side]?</label>
+			<label kind="assignment" x="1445" y="170">x:=0</label>
+			<nail x="1666" y="136"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="1334" y="-51">groen[side]!</label>
+			<label kind="assignment" x="1334" y="-34">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id0"/>
+			<label kind="guard" x="1334" y="59">isKolkEmpty()</label>
+			<label kind="synchronisation" x="1334" y="76">deurOpen[side]?</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="1071" y="-272">groen[side]!</label>
+			<label kind="assignment" x="1071" y="-255">x:=0</label>
+			<nail x="1326" y="-238"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="697" y="-272">deurOpen[side]?</label>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="1402" y="-161">!isKolkFull() &amp;&amp;
+!isPoolEmpty(side) &amp;&amp;
+x&gt;=vaarTijd</label>
+			<label kind="assignment" x="1402" y="-102">invaren(),
+x:=0</label>
+			<nail x="1394" y="-68"/>
+			<nail x="1394" y="-136"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="671" y="9">klepOpen[side]?</label>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id6"/>
+			<label kind="guard" x="195" y="76">areBothDoorsClosed() &amp;&amp; side==1</label>
+			<nail x="170" y="-68"/>
+			<nail x="170" y="102"/>
+			<nail x="510" y="102"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id2"/>
+			<label kind="guard" x="306" y="-280">areBothDoorsClosed() &amp;&amp; side==0</label>
+			<label kind="synchronisation" x="306" y="-263">deurOpen[side]!</label>
+			<nail x="204" y="-238"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="518" y="-93">deurDicht[!side]!</label>
+			<nail x="374" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id3"/>
+			<label kind="guard" x="714" y="-93">isKolkFull() || isPoolEmpty(side)</label>
+			<label kind="assignment" x="994" y="-93">side:=!side</label>
+			<nail x="1292" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="943" y="9">klepDicht[side]!</label>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="824" y="9">waterpeil?</label>
+			<nail x="799" y="34"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="1207" y="8">deurOpen[side]!</label>
+			<nail x="1190" y="136"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="1071" y="9">klepDicht[side]?</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="527" y="9">klepOpen[side]!</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="391" y="9">deurDicht[!side]?</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="guard" x="1742" y="-136">!isKolkEmpty() &amp;&amp;
+x&gt;=vaarTijd</label>
+			<label kind="assignment" x="1742" y="-102">uitvaren(),
+x:=0</label>
+			<nail x="1734" y="-136"/>
+			<nail x="1734" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id13"/>
+			<label kind="guard" x="1674" y="-212">isKolkEmpty()</label>
+			<label kind="assignment" x="1674" y="-195">x:=0</label>
+			<nail x="1666" y="-340"/>
+			<nail x="0" y="-340"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id10"/>
+			<label kind="guard" x="212" y="-42">deurState[!side]==1</label>
+			<label kind="synchronisation" x="212" y="-25">deurDicht[!side]!</label>
+			<nail x="204" y="34"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="guard" x="272" y="-212">deurState[side]==1</label>
+			<label kind="synchronisation" x="272" y="-195">groen[side]!</label>
+			<label kind="assignment" x="272" y="-178">x:=0</label>
+			<nail x="238" y="-136"/>
+			<nail x="1292" y="-136"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<label kind="guard" x="34" y="-178">!arePoolsEmpty()</label>
+			<label kind="assignment" x="34" y="-161">side=chooseSide(),
+x:=0,
+calculateTime()</label>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="guard" x="-187" y="-127">arePoolsEmpty()
+&amp;&amp; x&gt;=CHECKTIJD</label>
+			<label kind="assignment" x="-187" y="-85">x:=0</label>
+			<nail x="-60" y="-136"/>
+			<nail x="-60" y="-68"/>
+		</transition>
+	</template>
+	<template>
+		<name>SchipProducent</name>
+		<declaration>clock x;
+
+void updatePool(pool_id p)
+{
+    pool[p]++;
+}
+</declaration>
+		<location id="id16" x="0" y="0">
+			<name x="-76" y="0">Aanvoer</name>
+		</location>
+		<init ref="id16"/>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="select" x="85" y="-68">p:pool_id</label>
+			<label kind="guard" x="85" y="-42">!isPoolFull(p) &amp;&amp; 
+x&gt;=AANVOERTIJD</label>
+			<label kind="assignment" x="85" y="0">x:=0,
+updatePool(p)</label>
+			<nail x="68" y="-68"/>
+			<nail x="68" y="68"/>
+		</transition>
+	</template>
+	<template>
+		<name>Dobber</name>
+		<declaration>clock x;</declaration>
+		<location id="id17" x="0" y="-34">
+			<name x="17" y="-59">onderweg</name>
+			<label kind="invariant" x="17" y="-42">x&lt;=NIVELLEERTIJD</label>
+		</location>
+		<location id="id18" x="-144" y="-34">
+			<name x="-238" y="-59">bestemming</name>
+		</location>
+		<init ref="id18"/>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="-102" y="25">x&gt;=NIVELLEERTIJD</label>
+			<label kind="synchronisation" x="-102" y="8">waterpeil!</label>
+			<nail x="-34" y="0"/>
+			<nail x="-102" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-102" y="-102">waterpeil?</label>
+			<label kind="assignment" x="-68" y="-85">x:=0</label>
+			<nail x="-102" y="-68"/>
+			<nail x="-34" y="-68"/>
+		</transition>
+	</template>
+	<template>
+		<name>Sluisdeur</name>
+		<parameter>side_id p</parameter>
+		<declaration>clock x;</declaration>
+		<location id="id19" x="170" y="102">
+			<name x="127" y="119">deurGesloten</name>
+		</location>
+		<location id="id20" x="-170" y="0">
+			<committed/>
+		</location>
+		<location id="id21" x="-170" y="-68">
+			<committed/>
+		</location>
+		<location id="id22" x="0" y="-170">
+			<committed/>
+		</location>
+		<location id="id23" x="170" y="-68">
+			<committed/>
+		</location>
+		<location id="id24" x="170" y="0">
+			<committed/>
+		</location>
+		<location id="id25" x="170" y="-170">
+			<name x="136" y="-221">deurOpenen</name>
+			<label kind="invariant" x="136" y="-204">x&lt;=DEURTIJD</label>
+		</location>
+		<location id="id26" x="-170" y="102">
+			<name x="-238" y="119">deurSluiten</name>
+			<label kind="invariant" x="-238" y="136">x&lt;=DEURTIJD</label>
+		</location>
+		<location id="id27" x="-170" y="-170">
+			<name x="-263" y="-204">deurGeopend</name>
+		</location>
+		<init ref="id19"/>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="178" y="34">deurOpen[p]?</label>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id19"/>
+			<label kind="guard" x="-42" y="144">x&gt;=DEURTIJD</label>
+			<label kind="synchronisation" x="-42" y="110">deurDicht[p]!</label>
+			<label kind="assignment" x="-42" y="127">deurState[p]:=0</label>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-161" y="25">rood[3-p]!</label>
+			<label kind="assignment" x="-161" y="42">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-161" y="-51">rood[p]!</label>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-161" y="-136">deurDicht[p]?</label>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-127" y="-212">groen[3-p]!</label>
+			<label kind="assignment" x="-127" y="-195">deurState[p]:=1</label>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id22"/>
+			<label kind="guard" x="34" y="-195">x&gt;=DEURTIJD</label>
+			<label kind="synchronisation" x="34" y="-212">deurOpen[p]!</label>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="178" y="-127">roodGroen[3-p]!</label>
+			<label kind="assignment" x="178" y="-110">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="178" y="-42">roodGroen[p]!</label>
+		</transition>
+	</template>
+	<template>
+		<name>Sluisklep</name>
+		<parameter>side_id p</parameter>
+		<declaration>clock x;</declaration>
+		<location id="id28" x="136" y="102">
+			<committed/>
+		</location>
+		<location id="id29" x="238" y="-102">
+			<name x="204" y="-153">klepSluiten</name>
+			<label kind="invariant" x="204" y="-136">x&lt;=KLEPTIJD</label>
+		</location>
+		<location id="id30" x="340" y="0">
+			<name x="340" y="-34">klepGeopend</name>
+		</location>
+		<location id="id31" x="340" y="102">
+			<name x="289" y="119">klepOpenen</name>
+			<label kind="invariant" x="297" y="136">x&lt;=KLEPTIJD</label>
+		</location>
+		<location id="id32" x="136" y="0">
+			<name x="59" y="-34">klepGesloten</name>
+		</location>
+		<init ref="id32"/>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="204" y="102">waterpeil!</label>
+			<label kind="assignment" x="204" y="119">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="42" y="42">klepOpen[p]?</label>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id32"/>
+			<label kind="guard" x="85" y="-68">x&gt;=KLEPTIJD</label>
+			<label kind="synchronisation" x="93" y="-85">klepDicht[p]!</label>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="289" y="-76">klepDicht[p]?</label>
+			<label kind="assignment" x="348" y="-59">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id30"/>
+			<label kind="guard" x="348" y="34">x&gt;=KLEPTIJD</label>
+			<label kind="synchronisation" x="348" y="51">klepOpen[p]!</label>
+		</transition>
+	</template>
+	<template>
+		<name>Stoplicht</name>
+		<parameter>stoplicht_id p</parameter>
+		<location id="id33" x="-170" y="0" color="#ff0000">
+			<name x="-246" y="-25">roodLicht</name>
+		</location>
+		<location id="id34" x="-34" y="0" color="#ffa500">
+			<name x="-42" y="25">roodGroenLicht</name>
+		</location>
+		<location id="id35" x="102" y="0" color="#00ff00">
+			<name x="110" y="-59">groenLicht</name>
+		</location>
+		<init ref="id33"/>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-127" y="34">rood[p]?</label>
+			<nail x="-68" y="34"/>
+			<nail x="-136" y="34"/>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-59" y="-127">groen[p]?</label>
+			<nail x="-170" y="-102"/>
+			<nail x="102" y="-102"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-59" y="102">rood[p]?</label>
+			<nail x="102" y="102"/>
+			<nail x="-170" y="102"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="8" y="-59">groen[p]?</label>
+			<nail x="0" y="-34"/>
+			<nail x="68" y="-34"/>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-144" y="-59">roodGroen[p]?</label>
+			<nail x="-136" y="-34"/>
+			<nail x="-68" y="-34"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+// Process = Template();
+// List one or more processes to be composed into a system.
+system Controller, Dobber, Sluisdeur, Sluisklep, SchipProducent, Stoplicht;
+    </system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[]!(deurState[0]==1&amp;&amp;deurState[1]==1)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
