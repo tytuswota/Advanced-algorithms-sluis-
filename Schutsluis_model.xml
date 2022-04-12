@@ -14,6 +14,7 @@ const int KLEPTIJD  = 3;
 chan waterpeil, deurOpen[2], deurDicht[2], klepOpen[2], klepDicht[2];
 chan groen[4], roodGroen[4], rood[4];
 chan kolkIn, kolkUit;
+broadcast chan runNoodStop;
 broadcast chan schip;
 broadcast chan defineWater;
 
@@ -35,6 +36,7 @@ pool_counter pool[2];
 //binnen
 //1
 
+bool noodStop=0;
 
 bool isKolkEmpty()
 {
@@ -511,194 +513,421 @@ updatePool(p)</label>
 	<template>
 		<name>Sluisdeur</name>
 		<parameter>side_id p</parameter>
-		<declaration>clock x;</declaration>
-		<location id="id27" x="170" y="102">
-			<name x="127" y="119">deurGesloten</name>
+		<declaration>clock x;
+int[0,3] lastState = 0;</declaration>
+		<location id="id27" x="340" y="272">
+			<name x="297" y="289">deurGesloten</name>
 		</location>
-		<location id="id28" x="-170" y="0">
+		<location id="id28" x="-340" y="-8">
 			<committed/>
 		</location>
-		<location id="id29" x="-170" y="-68">
+		<location id="id29" x="-340" y="-76">
 			<committed/>
 		</location>
-		<location id="id30" x="0" y="-170">
+		<location id="id30" x="0" y="-340">
 			<committed/>
 		</location>
-		<location id="id31" x="170" y="-68">
+		<location id="id31" x="340" y="-68">
 			<committed/>
 		</location>
-		<location id="id32" x="170" y="0">
+		<location id="id32" x="340" y="0">
 			<committed/>
 		</location>
-		<location id="id33" x="170" y="-170">
-			<name x="136" y="-221">deurOpenen</name>
-			<label kind="invariant" x="136" y="-204">x&lt;=DEURTIJD</label>
+		<location id="id33" x="340" y="-340">
+			<name x="306" y="-391">deurOpenen</name>
+			<label kind="invariant" x="306" y="-374">x&lt;=DEURTIJD</label>
 		</location>
-		<location id="id34" x="-170" y="102">
-			<name x="-238" y="119">deurSluiten</name>
-			<label kind="invariant" x="-238" y="136">x&lt;=DEURTIJD</label>
+		<location id="id34" x="-340" y="272">
+			<name x="-408" y="289">deurSluiten</name>
+			<label kind="invariant" x="-408" y="306">x&lt;=DEURTIJD</label>
 		</location>
-		<location id="id35" x="-170" y="-170">
-			<name x="-263" y="-204">deurGeopend</name>
+		<location id="id35" x="-340" y="-340">
+			<name x="-433" y="-374">deurGeopend</name>
+		</location>
+		<location id="id36" x="0" y="-34">
+			<name x="-34" y="-85">emergency</name>
 		</location>
 		<init ref="id27"/>
 		<transition>
+			<source ref="id36"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-289" y="-17">lastState==3 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="-187" y="0">runNoodStop?</label>
+			<nail x="-34" y="-34"/>
+			<nail x="-306" y="204"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id27"/>
+			<label kind="guard" x="17" y="212">lastState==2 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="110" y="195">runNoodStop?</label>
+			<nail x="0" y="0"/>
+			<nail x="272" y="238"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id33"/>
+			<label kind="guard" x="102" y="-59">lastState==1 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="102" y="-76">runNoodStop?</label>
+			<nail x="34" y="-34"/>
+			<nail x="306" y="-272"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id35"/>
+			<label kind="guard" x="-204" y="-280">lastState==0 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="-204" y="-263">runNoodStop?</label>
+			<nail x="0" y="-68"/>
+			<nail x="-272" y="-306"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="guard" x="-221" y="-119">noodStop==1</label>
+			<label kind="synchronisation" x="-229" y="-102">runNoodStop?</label>
+			<label kind="assignment" x="-212" y="-85">lastState:=0</label>
+			<nail x="-306" y="-272"/>
+			<nail x="-34" y="-34"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id36"/>
+			<label kind="guard" x="-204" y="178">noodStop==1</label>
+			<label kind="synchronisation" x="-204" y="195">runNoodStop?</label>
+			<label kind="assignment" x="-204" y="212">lastState:=3</label>
+			<nail x="-272" y="238"/>
+			<nail x="0" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id36"/>
+			<label kind="guard" x="110" y="-255">noodStop==1</label>
+			<label kind="synchronisation" x="110" y="-289">runNoodStop?</label>
+			<label kind="assignment" x="119" y="-272">lastState:=1</label>
+			<nail x="280" y="-306"/>
+			<nail x="0" y="-68"/>
+		</transition>
+		<transition>
 			<source ref="id27"/>
 			<target ref="id32"/>
-			<label kind="synchronisation" x="178" y="34">deurOpen[p]?</label>
+			<label kind="synchronisation" x="348" y="34">deurOpen[p]?</label>
 		</transition>
 		<transition>
 			<source ref="id34"/>
 			<target ref="id27"/>
-			<label kind="guard" x="-42" y="110">x&gt;=DEURTIJD</label>
-			<label kind="synchronisation" x="-42" y="127">deurDicht[p]!</label>
-			<label kind="assignment" x="-42" y="144">deurState[p]:=0</label>
+			<label kind="guard" x="-42" y="280">x&gt;=DEURTIJD</label>
+			<label kind="synchronisation" x="-42" y="297">deurDicht[p]!</label>
+			<label kind="assignment" x="-42" y="314">deurState[p]:=0</label>
 		</transition>
 		<transition>
 			<source ref="id28"/>
 			<target ref="id34"/>
-			<label kind="synchronisation" x="-161" y="25">rood[p+2]!</label>
-			<label kind="assignment" x="-161" y="42">x:=0</label>
+			<label kind="synchronisation" x="-425" y="17">rood[p+2]!</label>
+			<label kind="assignment" x="-425" y="34">x:=0</label>
 		</transition>
 		<transition>
 			<source ref="id29"/>
 			<target ref="id28"/>
-			<label kind="synchronisation" x="-161" y="-51">rood[p]!</label>
+			<label kind="synchronisation" x="-425" y="-59">rood[p]!</label>
 		</transition>
 		<transition>
 			<source ref="id35"/>
 			<target ref="id29"/>
-			<label kind="synchronisation" x="-161" y="-136">deurDicht[p]?</label>
+			<label kind="synchronisation" x="-425" y="-187">deurDicht[p]?</label>
 		</transition>
 		<transition>
 			<source ref="id30"/>
 			<target ref="id35"/>
-			<label kind="synchronisation" x="-127" y="-212">deurOpen[p]!</label>
-			<label kind="assignment" x="-127" y="-195">deurState[p]:=1</label>
+			<label kind="synchronisation" x="-204" y="-382">deurOpen[p]!</label>
+			<label kind="assignment" x="-204" y="-365">deurState[p]:=1</label>
 		</transition>
 		<transition>
 			<source ref="id33"/>
 			<target ref="id30"/>
-			<label kind="guard" x="34" y="-212">x&gt;=DEURTIJD</label>
-			<label kind="synchronisation" x="34" y="-195">groen[p+2]!</label>
+			<label kind="guard" x="34" y="-382">x&gt;=DEURTIJD</label>
+			<label kind="synchronisation" x="34" y="-365">groen[p+2]!</label>
 		</transition>
 		<transition>
 			<source ref="id31"/>
 			<target ref="id33"/>
-			<label kind="synchronisation" x="178" y="-127">roodGroen[p+2]!</label>
-			<label kind="assignment" x="178" y="-110">x:=0</label>
+			<label kind="synchronisation" x="348" y="-127">roodGroen[p+2]!</label>
+			<label kind="assignment" x="348" y="-110">x:=0</label>
 		</transition>
 		<transition>
 			<source ref="id32"/>
 			<target ref="id31"/>
-			<label kind="synchronisation" x="178" y="-42">roodGroen[p]!</label>
+			<label kind="synchronisation" x="348" y="-42">roodGroen[p]!</label>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id36"/>
+			<label kind="guard" x="204" y="85">noodStop==1</label>
+			<label kind="synchronisation" x="204" y="51">runNoodStop?</label>
+			<label kind="assignment" x="204" y="68">lastState:=2</label>
+			<nail x="306" y="204"/>
+			<nail x="34" y="-34"/>
 		</transition>
 	</template>
 	<template>
 		<name>Sluisklep</name>
 		<parameter>side_id p</parameter>
-		<declaration>clock x;</declaration>
-		<location id="id36" x="136" y="102">
+		<declaration>clock x;
+int[0,3] lastState = 0;</declaration>
+		<location id="id37" x="-68" y="68">
 			<committed/>
 		</location>
-		<location id="id37" x="238" y="-102">
-			<name x="204" y="-153">klepSluiten</name>
-			<label kind="invariant" x="204" y="-136">x&lt;=KLEPTIJD</label>
+		<location id="id38" x="476" y="-204">
+			<name x="442" y="-255">klepSluiten</name>
+			<label kind="invariant" x="442" y="-238">x&lt;=KLEPTIJD</label>
 		</location>
-		<location id="id38" x="340" y="0">
-			<name x="340" y="-34">klepGeopend</name>
+		<location id="id39" x="476" y="340">
+			<name x="476" y="306">klepGeopend</name>
 		</location>
-		<location id="id39" x="340" y="102">
-			<name x="289" y="119">klepOpenen</name>
-			<label kind="invariant" x="297" y="136">x&lt;=KLEPTIJD</label>
+		<location id="id40" x="-68" y="340">
+			<name x="-119" y="357">klepOpenen</name>
+			<label kind="invariant" x="-111" y="374">x&lt;=KLEPTIJD</label>
 		</location>
-		<location id="id40" x="136" y="0">
-			<name x="59" y="-34">klepGesloten</name>
+		<location id="id41" x="-68" y="-204">
+			<name x="-145" y="-238">klepGesloten</name>
 		</location>
-		<init ref="id40"/>
+		<location id="id42" x="204" y="68">
+		</location>
+		<init ref="id41"/>
 		<transition>
-			<source ref="id36"/>
+			<source ref="id42"/>
+			<target ref="id40"/>
+			<label kind="guard" x="34" y="272">lastState==3 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="34" y="289">runNoodStop?</label>
+			<nail x="204" y="102"/>
+			<nail x="0" y="306"/>
+		</transition>
+		<transition>
+			<source ref="id42"/>
 			<target ref="id39"/>
-			<label kind="synchronisation" x="204" y="102">waterpeil!</label>
-			<label kind="assignment" x="204" y="119">x:=0</label>
+			<label kind="guard" x="280" y="76">lastState==2 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="280" y="93">runNoodStop?</label>
+			<nail x="238" y="68"/>
+			<nail x="442" y="272"/>
+		</transition>
+		<transition>
+			<source ref="id42"/>
+			<target ref="id38"/>
+			<label kind="guard" x="204" y="-170">lastState==1 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="204" y="-153">runNoodStop?</label>
+			<nail x="204" y="34"/>
+			<nail x="408" y="-170"/>
+		</transition>
+		<transition>
+			<source ref="id42"/>
+			<target ref="id41"/>
+			<label kind="guard" x="-51" y="34">lastState==0 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="-51" y="17">runNoodStop?</label>
+			<nail x="170" y="68"/>
+			<nail x="-34" y="-136"/>
 		</transition>
 		<transition>
 			<source ref="id40"/>
-			<target ref="id36"/>
-			<label kind="synchronisation" x="42" y="42">klepOpen[p]?</label>
+			<target ref="id42"/>
+			<label kind="guard" x="-34" y="144">noodStop==1</label>
+			<label kind="synchronisation" x="-34" y="161">runNoodStop?</label>
+			<label kind="assignment" x="-34" y="178">lastState:=3</label>
+			<nail x="-34" y="272"/>
+			<nail x="170" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id42"/>
+			<label kind="guard" x="204" y="187">noodStop==1</label>
+			<label kind="synchronisation" x="204" y="204">runNoodStop?</label>
+			<label kind="assignment" x="204" y="221">lastState:=2</label>
+			<nail x="408" y="306"/>
+			<nail x="204" y="102"/>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id42"/>
+			<label kind="guard" x="306" y="0">noodStop==1</label>
+			<label kind="synchronisation" x="306" y="17">runNoodStop?</label>
+			<label kind="assignment" x="306" y="34">lastState:=1</label>
+			<nail x="442" y="-136"/>
+			<nail x="238" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id42"/>
+			<label kind="guard" x="68" y="-153">noodStop==1</label>
+			<label kind="synchronisation" x="68" y="-136">runNoodStop?</label>
+			<label kind="assignment" x="68" y="-119">lastState:=0</label>
+			<nail x="0" y="-170"/>
+			<nail x="204" y="34"/>
 		</transition>
 		<transition>
 			<source ref="id37"/>
 			<target ref="id40"/>
-			<label kind="guard" x="85" y="-68">x&gt;=KLEPTIJD</label>
-			<label kind="synchronisation" x="93" y="-85">klepDicht[p]!</label>
+			<label kind="synchronisation" x="-144" y="161">waterpeil!</label>
+			<label kind="assignment" x="-144" y="178">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-161" y="-85">klepOpen[p]?</label>
 		</transition>
 		<transition>
 			<source ref="id38"/>
-			<target ref="id37"/>
-			<label kind="synchronisation" x="289" y="-76">klepDicht[p]?</label>
-			<label kind="assignment" x="348" y="-59">x:=0</label>
+			<target ref="id41"/>
+			<label kind="guard" x="195" y="-229">x&gt;=KLEPTIJD</label>
+			<label kind="synchronisation" x="203" y="-246">klepDicht[p]!</label>
 		</transition>
 		<transition>
 			<source ref="id39"/>
 			<target ref="id38"/>
-			<label kind="guard" x="323" y="8">x&gt;=KLEPTIJD</label>
-			<label kind="synchronisation" x="348" y="51">klepOpen[p]!</label>
+			<label kind="synchronisation" x="484" y="8">klepDicht[p]?</label>
+			<label kind="assignment" x="493" y="25">x:=0</label>
+		</transition>
+		<transition>
+			<source ref="id40"/>
+			<target ref="id39"/>
+			<label kind="guard" x="204" y="348">x&gt;=KLEPTIJD</label>
+			<label kind="synchronisation" x="204" y="365">klepOpen[p]!</label>
 		</transition>
 	</template>
 	<template>
 		<name>Stoplicht</name>
 		<parameter>stoplicht_id p</parameter>
-		<location id="id41" x="-170" y="0" color="#ff0000">
-			<name x="-246" y="-25">roodLicht</name>
+		<declaration>int[0,2] lastState=0;</declaration>
+		<location id="id43" x="-442" y="0" color="#ff0000">
+			<name x="-518" y="-25">roodLicht</name>
 		</location>
-		<location id="id42" x="-34" y="0" color="#ffa500">
-			<name x="-42" y="25">roodGroenLicht</name>
+		<location id="id44" x="-34" y="0" color="#ffa500">
+			<name x="-8" y="-8">roodGroenLicht</name>
 		</location>
-		<location id="id43" x="102" y="0" color="#00ff00">
-			<name x="110" y="-59">groenLicht</name>
+		<location id="id45" x="374" y="0" color="#00ff00">
+			<name x="382" y="-59">groenLicht</name>
 		</location>
-		<init ref="id41"/>
+		<init ref="id43"/>
 		<transition>
-			<source ref="id42"/>
-			<target ref="id41"/>
-			<label kind="synchronisation" x="-127" y="34">rood[p]?</label>
-			<nail x="-68" y="34"/>
-			<nail x="-136" y="34"/>
-		</transition>
-		<transition>
-			<source ref="id41"/>
-			<target ref="id43"/>
-			<label kind="synchronisation" x="-59" y="-127">groen[p]?</label>
-			<nail x="-170" y="-102"/>
-			<nail x="102" y="-102"/>
+			<source ref="id43"/>
+			<target ref="id45"/>
+			<label kind="guard" x="68" y="-25">lastState==2 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="161" y="-8">runNoodStop?</label>
+			<nail x="-408" y="68"/>
+			<nail x="-408" y="102"/>
+			<nail x="263" y="102"/>
+			<nail x="263" y="-17"/>
+			<nail x="306" y="-17"/>
 		</transition>
 		<transition>
 			<source ref="id43"/>
-			<target ref="id41"/>
-			<label kind="synchronisation" x="-59" y="102">rood[p]?</label>
-			<nail x="102" y="102"/>
-			<nail x="-170" y="102"/>
+			<target ref="id44"/>
+			<label kind="guard" x="-246" y="42">lastState==1 &amp;&amp; noodStop==0</label>
+			<label kind="synchronisation" x="-153" y="59">runNoodStop?</label>
+			<nail x="-408" y="68"/>
+			<nail x="-408" y="102"/>
+			<nail x="-68" y="102"/>
 		</transition>
 		<transition>
-			<source ref="id42"/>
+			<source ref="id44"/>
 			<target ref="id43"/>
-			<label kind="synchronisation" x="8" y="-59">groen[p]?</label>
-			<nail x="0" y="-34"/>
-			<nail x="68" y="-34"/>
+			<label kind="guard" x="-25" y="25">noodStop==1</label>
+			<label kind="synchronisation" x="-25" y="42">runNoodStop?</label>
+			<label kind="assignment" x="-25" y="59">lastState:=1</label>
+			<nail x="-34" y="102"/>
+			<nail x="-408" y="102"/>
+			<nail x="-408" y="68"/>
 		</transition>
 		<transition>
-			<source ref="id41"/>
-			<target ref="id42"/>
-			<label kind="synchronisation" x="-144" y="-59">roodGroen[p]?</label>
-			<nail x="-136" y="-34"/>
+			<source ref="id45"/>
+			<target ref="id43"/>
+			<label kind="guard" x="280" y="25">noodStop==1</label>
+			<label kind="synchronisation" x="280" y="42">runNoodStop?</label>
+			<label kind="assignment" x="280" y="59">lastState:=2</label>
+			<nail x="272" y="0"/>
+			<nail x="272" y="102"/>
+			<nail x="-408" y="102"/>
+			<nail x="-408" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-399" y="34">rood[p]?</label>
+			<nail x="-68" y="34"/>
+			<nail x="-408" y="34"/>
+		</transition>
+		<transition>
+			<source ref="id43"/>
+			<target ref="id45"/>
+			<label kind="guard" x="-59" y="-246">lastState==0</label>
+			<label kind="synchronisation" x="-59" y="-229">groen[p]?</label>
+			<nail x="-442" y="-204"/>
+			<nail x="374" y="-204"/>
+		</transition>
+		<transition>
+			<source ref="id45"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-331" y="204">rood[p]?</label>
+			<nail x="374" y="204"/>
+			<nail x="-442" y="204"/>
+		</transition>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="280" y="-59">groen[p]?</label>
+			<nail x="0" y="-34"/>
+			<nail x="340" y="-34"/>
+		</transition>
+		<transition>
+			<source ref="id43"/>
+			<target ref="id44"/>
+			<label kind="guard" x="-416" y="-76">lastState==0</label>
+			<label kind="synchronisation" x="-416" y="-59">roodGroen[p]?</label>
+			<nail x="-408" y="-34"/>
 			<nail x="-68" y="-34"/>
+		</transition>
+	</template>
+	<template>
+		<name>NoodKnop</name>
+		<location id="id46" x="204" y="0">
+			<name x="204" y="-34">stop</name>
+		</location>
+		<location id="id47" x="0" y="0">
+			<name x="-25" y="-34">idle</name>
+		</location>
+		<location id="id48" x="102" y="-68">
+			<committed/>
+		</location>
+		<location id="id49" x="102" y="68">
+			<committed/>
+		</location>
+		<init ref="id47"/>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id49"/>
+			<label kind="assignment" x="153" y="76">noodStop:=0</label>
+			<nail x="170" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id47"/>
+			<target ref="id48"/>
+			<label kind="assignment" x="-17" y="-93">noodStop:=1</label>
+			<nail x="34" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="-8" y="76">runNoodStop!</label>
+			<nail x="34" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="153" y="-93">runNoodStop!</label>
+			<nail x="170" y="-68"/>
 		</transition>
 	</template>
 	<system>// Place template instantiations here.
 // Process = Template();
 // List one or more processes to be composed into a system.
-system Controller, Dobber, Sluisdeur, Sluisklep, SchipProducent, Stoplicht, Kolk;
+system Controller, Dobber, Sluisdeur, Sluisklep, SchipProducent, Stoplicht, Kolk, NoodKnop;
     </system>
 	<queries>
 		<query>
