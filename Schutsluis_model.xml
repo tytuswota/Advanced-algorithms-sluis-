@@ -6,8 +6,8 @@ const int POOL_SIZE = 3;
 const int KOLK_SIZE = 2;
 
 // 1 tijdseenheid = 10 seconden
-const int MAXAANVOERTIJD = 1;
-const int MINAANVOERTIJD = 1;
+const int MAXAANVOERTIJD = 60;
+const int MINAANVOERTIJD = 6;
 const int DEURTIJD  = 9;
 const int KLEPTIJD  = 3;
 
@@ -173,12 +173,6 @@ bool areBothDoorsClosed()
 		</location>
 		<location id="id18" x="-102" y="-102">
 			<name x="-212" y="-119">checkRequest</name>
-			<label kind="comments" x="-382" y="263">Beter kijken naar het vier variable model
-Aanmeldingssysteem
-
-3 dobbers
-
-Model van de pool en kolk zelf maken voor het in en uitvaren van de boten</label>
 		</location>
 		<location id="id19" x="646" y="34">
 			<name x="586" y="51">kleppenOpen_Nside</name>
@@ -190,7 +184,8 @@ Model van de pool en kolk zelf maken voor het in en uitvaren van de boten</label
 		<transition>
 			<source ref="id13"/>
 			<target ref="id0"/>
-			<label kind="guard" x="1632" y="-144">!arePoolsEmpty()</label>
+			<label kind="guard" x="1632" y="-161">!arePoolsEmpty() &amp;&amp;
+noodStop==0</label>
 			<label kind="synchronisation" x="1632" y="-127">kolkUit?</label>
 			<nail x="1700" y="-102"/>
 			<nail x="1700" y="238"/>
@@ -206,6 +201,7 @@ y:=0</label>
 		<transition>
 			<source ref="id18"/>
 			<target ref="id0"/>
+			<label kind="guard" x="-59" y="-102">noodStop==0</label>
 			<label kind="synchronisation" x="-51" y="-127">schip?</label>
 		</transition>
 		<transition>
@@ -292,6 +288,7 @@ y:=0</label>
 		<transition>
 			<source ref="id16"/>
 			<target ref="id8"/>
+			<label kind="guard" x="790" y="-93">noodStop==0</label>
 			<label kind="synchronisation" x="714" y="-110">kolkIn?</label>
 			<label kind="assignment" x="714" y="-93">side:=!side</label>
 			<nail x="1292" y="-68"/>
@@ -304,6 +301,7 @@ y:=0</label>
 		<transition>
 			<source ref="id20"/>
 			<target ref="id9"/>
+			<label kind="guard" x="807" y="34">noodStop==0</label>
 			<label kind="synchronisation" x="824" y="9">waterpeil?</label>
 			<nail x="799" y="34"/>
 		</transition>
@@ -331,7 +329,8 @@ y:=0</label>
 		<transition>
 			<source ref="id13"/>
 			<target ref="id18"/>
-			<label kind="guard" x="1606" y="-229">arePoolsEmpty()</label>
+			<label kind="guard" x="1606" y="-246">arePoolsEmpty() &amp;&amp;
+noodStop==0</label>
 			<label kind="synchronisation" x="1606" y="-212">kolkUit?</label>
 			<label kind="assignment" x="-84" y="-340">y:=0</label>
 			<nail x="1598" y="-340"/>
@@ -416,8 +415,9 @@ x:=0</label>
 			<source ref="id21"/>
 			<target ref="id21"/>
 			<label kind="guard" x="-595" y="-76">!isKolkEmpty() &amp;&amp;
-x&gt;=vaarTijd</label>
-			<label kind="assignment" x="-595" y="-34">uitvaren(),
+x&gt;=vaarTijd &amp;&amp;
+noodStop==0</label>
+			<label kind="assignment" x="-595" y="-25">uitvaren(),
 x:=0</label>
 			<nail x="-476" y="-68"/>
 			<nail x="-476" y="0"/>
@@ -444,8 +444,9 @@ isPoolEmpty(side)</label>
 			<target ref="id22"/>
 			<label kind="guard" x="144" y="-76">!isKolkFull() &amp;&amp;
 !isPoolEmpty(side) &amp;&amp;
-x&gt;=vaarTijd</label>
-			<label kind="assignment" x="144" y="-17">invaren(),
+x&gt;=vaarTijd &amp;&amp;
+noodStop==0</label>
+			<label kind="assignment" x="144" y="0">invaren(),
 x:=0</label>
 			<nail x="136" y="-68"/>
 			<nail x="136" y="0"/>
@@ -551,15 +552,16 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id36"/>
 			<target ref="id34"/>
-			<label kind="guard" x="-289" y="-17">lastState==3 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="-187" y="-17">lastState==3</label>
 			<label kind="synchronisation" x="-187" y="0">runNoodStop?</label>
+			<label kind="assignment" x="-187" y="17">x:=0</label>
 			<nail x="-34" y="-34"/>
 			<nail x="-306" y="204"/>
 		</transition>
 		<transition>
 			<source ref="id36"/>
 			<target ref="id27"/>
-			<label kind="guard" x="17" y="212">lastState==2 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="17" y="212">lastState==2</label>
 			<label kind="synchronisation" x="110" y="195">runNoodStop?</label>
 			<nail x="0" y="0"/>
 			<nail x="272" y="238"/>
@@ -567,15 +569,16 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id36"/>
 			<target ref="id33"/>
-			<label kind="guard" x="102" y="-59">lastState==1 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="102" y="-59">lastState==1</label>
 			<label kind="synchronisation" x="102" y="-76">runNoodStop?</label>
+			<label kind="assignment" x="102" y="-42">x:=0</label>
 			<nail x="34" y="-34"/>
 			<nail x="306" y="-272"/>
 		</transition>
 		<transition>
 			<source ref="id36"/>
 			<target ref="id35"/>
-			<label kind="guard" x="-204" y="-280">lastState==0 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="-204" y="-280">lastState==0</label>
 			<label kind="synchronisation" x="-204" y="-263">runNoodStop?</label>
 			<nail x="0" y="-68"/>
 			<nail x="-272" y="-306"/>
@@ -696,15 +699,16 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id42"/>
 			<target ref="id40"/>
-			<label kind="guard" x="34" y="272">lastState==3 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="34" y="272">lastState==3</label>
 			<label kind="synchronisation" x="34" y="289">runNoodStop?</label>
+			<label kind="assignment" x="59" y="255">x:=0</label>
 			<nail x="204" y="102"/>
 			<nail x="0" y="306"/>
 		</transition>
 		<transition>
 			<source ref="id42"/>
 			<target ref="id39"/>
-			<label kind="guard" x="280" y="76">lastState==2 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="280" y="76">lastState==2</label>
 			<label kind="synchronisation" x="280" y="93">runNoodStop?</label>
 			<nail x="238" y="68"/>
 			<nail x="442" y="272"/>
@@ -712,16 +716,17 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id42"/>
 			<target ref="id38"/>
-			<label kind="guard" x="204" y="-170">lastState==1 &amp;&amp; noodStop==0</label>
-			<label kind="synchronisation" x="204" y="-153">runNoodStop?</label>
+			<label kind="guard" x="272" y="-161">lastState==1</label>
+			<label kind="synchronisation" x="272" y="-144">runNoodStop?</label>
+			<label kind="assignment" x="272" y="-127">x:=0</label>
 			<nail x="204" y="34"/>
 			<nail x="408" y="-170"/>
 		</transition>
 		<transition>
 			<source ref="id42"/>
 			<target ref="id41"/>
-			<label kind="guard" x="-51" y="34">lastState==0 &amp;&amp; noodStop==0</label>
-			<label kind="synchronisation" x="-51" y="17">runNoodStop?</label>
+			<label kind="guard" x="-34" y="-25">lastState==0</label>
+			<label kind="synchronisation" x="-34" y="-42">runNoodStop?</label>
 			<nail x="170" y="68"/>
 			<nail x="-34" y="-136"/>
 		</transition>
@@ -795,7 +800,7 @@ int[0,3] lastState = 0;</declaration>
 		<name>Stoplicht</name>
 		<parameter>stoplicht_id p</parameter>
 		<declaration>int[0,2] lastState=0;</declaration>
-		<location id="id43" x="-442" y="0" color="#ff0000">
+		<location id="id43" x="-442" y="0" color="#000000">
 			<name x="-518" y="-25">roodLicht</name>
 		</location>
 		<location id="id44" x="-34" y="0" color="#ffa500">
@@ -808,8 +813,9 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id43"/>
 			<target ref="id45"/>
-			<label kind="guard" x="68" y="-25">lastState==2 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="161" y="-25">lastState==2</label>
 			<label kind="synchronisation" x="161" y="-8">runNoodStop?</label>
+			<label kind="assignment" x="161" y="8">lastState:=0</label>
 			<nail x="-408" y="68"/>
 			<nail x="-408" y="102"/>
 			<nail x="263" y="102"/>
@@ -819,8 +825,9 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id43"/>
 			<target ref="id44"/>
-			<label kind="guard" x="-246" y="42">lastState==1 &amp;&amp; noodStop==0</label>
+			<label kind="guard" x="-144" y="42">lastState==1</label>
 			<label kind="synchronisation" x="-153" y="59">runNoodStop?</label>
+			<label kind="assignment" x="-144" y="76">lastState:=0</label>
 			<nail x="-408" y="68"/>
 			<nail x="-408" y="102"/>
 			<nail x="-68" y="102"/>
@@ -895,16 +902,7 @@ int[0,3] lastState = 0;</declaration>
 		<location id="id48" x="102" y="-68">
 			<committed/>
 		</location>
-		<location id="id49" x="102" y="68">
-			<committed/>
-		</location>
 		<init ref="id47"/>
-		<transition>
-			<source ref="id46"/>
-			<target ref="id49"/>
-			<label kind="assignment" x="153" y="76">noodStop:=0</label>
-			<nail x="170" y="68"/>
-		</transition>
 		<transition>
 			<source ref="id47"/>
 			<target ref="id48"/>
@@ -912,9 +910,11 @@ int[0,3] lastState = 0;</declaration>
 			<nail x="34" y="-68"/>
 		</transition>
 		<transition>
-			<source ref="id49"/>
+			<source ref="id46"/>
 			<target ref="id47"/>
-			<label kind="synchronisation" x="-8" y="76">runNoodStop!</label>
+			<label kind="synchronisation" x="68" y="76">runNoodStop!</label>
+			<label kind="assignment" x="68" y="93">noodStop:=0</label>
+			<nail x="170" y="68"/>
 			<nail x="34" y="68"/>
 		</transition>
 		<transition>
