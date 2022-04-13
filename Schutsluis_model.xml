@@ -546,7 +546,7 @@ int[0,3] lastState = 0;</declaration>
 			<name x="-433" y="-374">deurGeopend</name>
 		</location>
 		<location id="id36" x="0" y="-34">
-			<name x="-34" y="-85">emergency</name>
+			<name x="-34" y="-119">emergency</name>
 		</location>
 		<init ref="id27"/>
 		<transition>
@@ -694,6 +694,7 @@ int[0,3] lastState = 0;</declaration>
 			<name x="-145" y="-238">klepGesloten</name>
 		</location>
 		<location id="id42" x="204" y="68">
+			<name x="170" y="-25">emergency</name>
 		</location>
 		<init ref="id41"/>
 		<transition>
@@ -906,6 +907,7 @@ int[0,3] lastState = 0;</declaration>
 		<transition>
 			<source ref="id47"/>
 			<target ref="id48"/>
+			<label kind="guard" x="-34" y="-119">noodStop==1</label>
 			<label kind="assignment" x="-17" y="-93">noodStop:=1</label>
 			<nail x="34" y="-68"/>
 		</transition>
