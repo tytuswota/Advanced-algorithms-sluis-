@@ -153,19 +153,19 @@ bool areBothDoorsClosed()
 			<committed/>
 		</location>
 		<location id="id12" x="1054" y="34">
-			<name x="1003" y="51">kleppenDicht_Nside</name>
+			<name x="1011" y="51">kleppenDicht</name>
 		</location>
 		<location id="id13" x="1598" y="-102">
-			<name x="1496" y="-110">Uitvaren_side</name>
+			<name x="1513" y="-110">Uitvaren</name>
 		</location>
 		<location id="id14" x="1326" y="136">
-			<name x="1283" y="153">DeurOpen_side</name>
+			<name x="1292" y="153">DeurOpen</name>
 		</location>
 		<location id="id15" x="374" y="34">
-			<name x="331" y="51">DeurDicht_Nside</name>
+			<name x="348" y="51">DeurDicht</name>
 		</location>
 		<location id="id16" x="1326" y="-102">
-			<name x="1343" y="-119">Invaren_side</name>
+			<name x="1343" y="-119">Invaren</name>
 		</location>
 		<location id="id17" x="204" y="-102">
 			<name x="229" y="-119">handleRequest</name>
@@ -175,7 +175,7 @@ bool areBothDoorsClosed()
 			<name x="-212" y="-119">checkRequest</name>
 		</location>
 		<location id="id19" x="646" y="34">
-			<name x="586" y="51">kleppenOpen_Nside</name>
+			<name x="612" y="51">kleppenOpen</name>
 		</location>
 		<location id="id20" x="782" y="34">
 			<name x="756" y="51">Nivelleren</name>
